@@ -12,13 +12,19 @@ vim .env
 ```
 
 ## Deploy - Docker (Build)
+```bash
 docker compose build
+```
 
 ## Deploy - Docker (Attended)
+```bash
 docker compose up
+```
 
 ## Deploy - Docker (Unattended/background)
+```bash
 docker compose up -d
+```
 
 ## Develop - Flask (venv)
 **Requirements:**
@@ -50,7 +56,3 @@ Run the app
 ```bash
 flask run
 ```
-
-## Develop - Vue
-Requirements:
-- Node.js
