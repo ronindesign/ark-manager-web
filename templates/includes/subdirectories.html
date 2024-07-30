@@ -1,0 +1,18 @@
+{% for subdirectory in directory.directories %}
+    <li 
+        id="collapse{{directory.id}}" 
+        class="collapse show"
+        style="margin-left: {{subdirectory.depth}}px; font-size: 17px;"
+    >
+        <i class="fas fa-folder"></i>
+        <a 
+            style="cursor: pointer;"
+            onclick="window.location.href = '{{ url_for('file_manager_blueprint.file_manager', directory=subdirectory.path|encoded_path) }}';"
+        >
+            {{ subdirectory.name }}
+        </a>
+    </li>
+    {% with directory=subdirectory %}
+        {% include 'includes/subdirectories.html' %}
+    {% endwith %}
+{% endfor %}
