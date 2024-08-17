@@ -1,28 +1,41 @@
-version: '3.8'
 services:
   arkmanweb_app:
     container_name: arkmanweb_app
     restart: always
     build: .
-    networks:
-      - db_network
-      - web_network
+    environment:
+      #- WEBHOOK_SERVER_HOST=100.65.212.110
+      - WEBHOOK_SERVER_HOST=lab1
+      - WEBHOOK_SERVER_PORT=13390
+    network_mode: service:tailscale-nginx
     volumes:
       - ./templates:/templates
   arkmanweb_nginx:
     container_name: arkmanweb_nginx
     restart: always
     image: "nginx:latest"
-    ports:
-      - "5085:5085"
     volumes:
       - ./nginx:/etc/nginx/conf.d
-    networks:
-      - web_network
+    network_mode: service:tailscale-nginx
     depends_on:
       - arkmanweb_app
-networks:
-  db_network:
-    driver: bridge
-  web_network:
-    driver: bridge
+      - tailscale-nginx
+  tailscale-nginx:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-nginx
+    hostname: arkdash
+    environment:
+      - TS_AUTHKEY=tskey-auth-kVRc1EExUu11CNTRL-f28qHXZ1QQY28XRGe1szPYXJ9WAmTm7x
+      #- TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - tailscale-data-webserver1:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: unless-stopped
+volumes:
+  tailscale-data-webserver1:
+    driver: local
