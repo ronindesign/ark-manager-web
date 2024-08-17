@@ -67,16 +67,6 @@
 <script type="text/javascript">
 	let server_host = '{{ server_host }}';
 	let server_port = '{{ server_port }}';
-	const tree = new VanillaTree(main, {
-		contextmenu: [{
-			label: 'Restore',
-			action: function (id) {
-				var answer = prompt('Are you sure you want to restore: ' + id + '\nTo confirm, enter the backup file timestamp (format: HH:MM:SS)');
-				console.log(answer)
-				run(answer, server_host, server_port);
-			}
-		}]
-	});
 
 	let xhr = new XMLHttpRequest();
 
@@ -140,39 +130,117 @@
     // Sending our request
     xhr.send();
 
-	tree.add({
-    label: 'Label A',
-    id: 'a',
-    opened: true
-});
+	const tree = new VanillaTree(main, {
+		contextmenu: [{
+			label: 'Restore',
+			action: function (id) {
+				var answer = prompt('Are you sure you want to restore: ' + id + '\nTo confirm, enter the backup file timestamp (format: HH:MM:SS)');
+				console.log(answer)
+				run(answer, server_host, server_port);
+			}
+		}]
+	});
 
-tree.add({
-    label: 'Label B',
-    id: 'b'
-});
 
-tree.add({
-    label: 'Label A.A',
-    parent: 'a',
-    id: 'a.a',
-    opened: true,
-    selected: true
-});
+	// Backup list JSON format example:
+	// [
+	// 	{
+	// 		"type": "directory",
+	// 		"name": "/home/steam/ARK-Backups/",
+	// 		"contents": [
+	// 		{
+	// 			"type": "directory",
+	// 			"name": "2021-04-14",
+	// 			"contents": [
+	// 			{
+	// 				"type": "file",
+	// 				"name": "ragnarok.2021-04-14_21.09.58.tar.bz2"
+	// 			},
+	// 			{
+	// 				"type": "file",
+	// 				"name": "ragnarok.2021-04-14_22.00.02.tar.bz2"
+	// 			},
+	// 			{
+	// 				"type": "file",
+	// 				"name": "ragnarok.2021-04-14_23.28.54.tar.bz2"
+	// 			}
+	// 			]
+	// 		},
 
-tree.add({
-    label: 'Label A.A.A',
-    parent: 'a.a'
-});
+	let xhr2 = new XMLHttpRequest();
 
-tree.add({
-    label: 'Label A.A.B',
-    parent: 'a.a'
-});
+    // Making our connection
+    xhr2.open("GET", 'http://' + server_host + ':' + server_port + '/hooks/ark-backup-list', true);
 
-tree.add({
-    label: 'Label B.A',
-    parent: 'b'
-});
+    // function execute after request is successful
+    xhr2.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+			let backup_list = JSON.parse(this.responseText);
+			console.log(JSON.stringify(backup_list, null, 4));
+
+            backup_list[0]["contents"].forEach(function(item) {
+				if (item.type == 'directory') {
+					tree.add({
+						label: item.name,
+						id: item.name
+					});
+					if (item.contents.length > 0) {
+						item.contents.forEach(function(item2) {
+							if (item2.type == 'file') {
+								tree.add({
+									label: item2.name,
+									id: item.name + '/' + item2.name,
+									parent: item.name
+								});
+							}
+						});
+					} else {
+						console.log('[Error] Encountered directory with no files: ' + item.name);
+					}
+				} else {
+					console.log('[Error] Encountered file where only dated directories of backups should be: ' + item.name);
+				}
+			});
+
+			// tree.add({
+			// 	label: 'Label A',
+			// 	id: 'a',
+			// 	opened: true
+			// });
+
+			// tree.add({
+			// 	label: 'Label B',
+			// 	id: 'b'
+			// });
+
+			// tree.add({
+			// 	label: 'Label A.A',
+			// 	parent: 'a',
+			// 	id: 'a.a',
+			// 	opened: true,
+			// 	selected: true
+			// });
+
+			// tree.add({
+			// 	label: 'Label A.A.A',
+			// 	parent: 'a.a'
+			// });
+
+			// tree.add({
+			// 	label: 'Label A.A.B',
+			// 	parent: 'a.a'
+			// });
+
+			// tree.add({
+			// 	label: 'Label B.A',
+			// 	parent: 'b'
+			// });
+        }
+    }
+    // Sending our request
+    xhr2.send();
+
+
 </script>
 
 {% endblock extra_js %}
