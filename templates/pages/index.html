@@ -180,11 +180,11 @@
 
             backup_list[0]["contents"].forEach(function(item) {
 				if (item.type == 'directory') {
-					tree.add({
-						label: item.name,
-						id: item.name
-					});
 					if (item.contents.length > 0) {
+						tree.add({
+							label: item.name,
+							id: item.name
+						});
 						item.contents.forEach(function(item2) {
 							if (item2.type == 'file') {
 								tree.add({
