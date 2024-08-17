@@ -1,12 +1,12 @@
 'use strict';
 
-function run(answer, server_host, server_port) {
-    console.log('Running: ' + answer)
+function run(id, server_host, server_port) {
+    console.log('Restoring: ' + id)
     // Creating Our XMLHttpRequest object
     let xhr = new XMLHttpRequest();
 
     // Making our connection
-    let url = 'http://' + server_host + ':' + server_port + '/hooks/ark-servers?server=ragnarok&output=json';
+    let url = 'http://' + server_host + ':' + server_port + '/hooks/ark-servers?restore=' + id + '&output=json';
     xhr.open("GET", url, true);
 
     // function execute after request is successful
