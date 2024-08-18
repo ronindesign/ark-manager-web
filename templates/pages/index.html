@@ -133,10 +133,27 @@
 	const tree = new VanillaTree(main, {
 		contextmenu: [{
 			label: 'Restore',
-			action: function (id) {
-				var answer = prompt('Are you sure you want to restore: ' + id + '\nTo confirm, enter the backup file timestamp (format: HH:MM:SS)');
-				console.log(answer)
-				run(answer, server_host, server_port);
+			action: function (path) {
+				// Format expected: map.2021-04-14_21.09.58.tar.bz2
+				let [server, ...path] = path.split('.')
+				backup_timestamp = path[0].substr(-2) + '.' + path.slice(1,3).join('.')
+				path = path.join('.')
+				if (server == 'ragnarok') {
+					var reggie = /(\d{4})-(\d{2})-(\d{2})_(\d{2}).(\d{2}).(\d{2})/
+					var [, year, month, day, hours, minutes, seconds] = reggie.exec(path.split('.').slice(1,4).join('.'))
+					var backup_datetime = new Date(year, month-1, day, hours, minutes, seconds).toLocaleString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", hour:"numeric", minute:"numeric"});
+					console.log('Backup created: ' + backup_datetime)
+					var answer = prompt('Are you sure you want to restore:\n' + path + '\n(Backup created: ' + backup_datetime + ')\nTo confirm, enter the time part of the backup filename (format: HH.MM.SS)\n(E.g. for `ragnarok.2021-04-14_21.09.58.tar.bz2`, enter `21.09.58`)');
+					console.log(answer)
+					if (answer == backup_timestamp) {
+						run(path, server_host, server_port);
+					} else {
+						alert('Backup timestamp does not match, refusing to restore\nExpected: ' + backup_timestamp + '\nReceived: ' + answer)
+						console.log('Backup timestamp does not match, refusing to restore')
+					}
+				} else {
+					console.log('Server backup for map `' + server + '` ('+server+'.'+path+') ignored')
+				}
 			}
 		}]
 	});
