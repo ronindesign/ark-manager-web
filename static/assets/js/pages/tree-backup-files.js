@@ -6,13 +6,15 @@ function run(backup_path, server_host, server_port) {
     let xhr = new XMLHttpRequest();
 
     // Making our connection
-    let url = 'http://' + server_host + ':' + server_port + '/hooks/ark-servers?restore=' + backup_path + '&output=json';
+    let url = 'http://' + server_host + ':' + server_port + '/hooks/ark-backup-restore?restore=' + backup_path + '&output=json';
     xhr.open("GET", url, true);
 
     // function execute after request is successful
     xhr.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             console.log(this.responseText);
+        } else {
+            console.log('Error: ' + this.statusText);
         }
     }
     // Sending our request

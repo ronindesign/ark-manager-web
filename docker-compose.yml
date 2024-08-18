@@ -3,7 +3,14 @@ services:
   arkmanweb_app:
     container_name: arkmanweb_app
     restart: always
+    env_file:
+      - .env
     build: .
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /
     networks:
       - db_network
       - web_network
