@@ -21,11 +21,11 @@
 							<h3 class="f-w-300 d-flex align-items-center m-b-0">
 								<i id="server-status-icon" class="feather icon-arrow-down text-c-red m-r-5"></i>Ragnarok
 								<div id="server-start-icon" class="i-block" data-clipboard-text="Start" data-bs-toggle="tooltip" data-filter="Start" title="" data-bs-original-title="Start" aria-label="Start" style="display: inline-flex;">
-									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-start-ragnarok"><i class="fas fa-play text-c-green m-l-20"></i></a></div>
+									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-start-ragnarok" target="_blank"><i class="fas fa-play text-c-green m-l-20"></i></a></div>
 								<div id="server-stop-icon" class="i-block" data-clipboard-text="Stop" data-bs-toggle="tooltip" data-filter="Stop" title="" data-bs-original-title="Stop" aria-label="Stop" style="display: none;">
-									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-stop-ragnarok"><i class="fas fa-stop text-c-red m-l-20"></i></a></div>
+									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-stop-ragnarok" target="_blank"><i class="fas fa-stop text-c-red m-l-20"></i></a></div>
 								<div id="server-backup-icon" class="i-block" data-clipboard-text="Backup" data-bs-toggle="tooltip" data-filter="Backup" title="" data-bs-original-title="Backup" aria-label="Backup" style="display: inline-flex;">
-									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-backup-ragnarok"><i class="fas fa-copy text-c-blue m-l-20"></i></a></div></h3>
+									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-backup-ragnarok" target="_blank"><i class="fas fa-copy text-c-blue m-l-20"></i></a></div></h3>
 						</div>
 
 						<div class="col-3 text-end">
@@ -135,9 +135,9 @@
 			label: 'Restore',
 			action: function (path) {
 				// Format expected: map.2021-04-14_21.09.58.tar.bz2
-				let [server, ...path] = path.split('.')
-				backup_timestamp = path[0].substr(-2) + '.' + path.slice(1,3).join('.')
-				path = path.join('.')
+				let [server, ...part] = path.split('.')
+				backup_timestamp = part[0].substr(-2) + '.' + part.slice(1,3).join('.')
+				path = part.join('.')
 				if (server == 'ragnarok') {
 					var reggie = /(\d{4})-(\d{2})-(\d{2})_(\d{2}).(\d{2}).(\d{2})/
 					var [, year, month, day, hours, minutes, seconds] = reggie.exec(path.split('.').slice(1,4).join('.'))
@@ -193,7 +193,7 @@
     xhr2.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
 			let backup_list = JSON.parse(this.responseText);
-			console.log(JSON.stringify(backup_list, null, 4));
+			// console.log(JSON.stringify(backup_list, null, 4));
 
             backup_list[0]["contents"].forEach(function(item) {
 				if (item.type == 'directory') {
@@ -212,7 +212,7 @@
 							}
 						});
 					} else {
-						console.log('[Error] Encountered directory with no files: ' + item.name);
+						// console.log('[Error] Encountered directory with no files: ' + item.name);
 					}
 				} else {
 					console.log('[Error] Encountered file where only dated directories of backups should be: ' + item.name);
