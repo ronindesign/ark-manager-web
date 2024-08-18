@@ -1,12 +1,12 @@
 'use strict';
 
-function run(id, server_host, server_port) {
-    console.log('Restoring: ' + id)
+function run(backup_path, server_host, server_port) {
+    console.log('Restoring: ' + backup_path)
     // Creating Our XMLHttpRequest object
     let xhr = new XMLHttpRequest();
 
     // Making our connection
-    let url = 'http://' + server_host + ':' + server_port + '/hooks/ark-servers?restore=' + id + '&output=json';
+    let url = 'http://' + server_host + ':' + server_port + '/hooks/ark-servers?restore=' + backup_path + '&output=json';
     xhr.open("GET", url, true);
 
     // function execute after request is successful
