@@ -7,7 +7,7 @@ services:
     build: .
     environment:
       #- WEBHOOK_SERVER_HOST=100.65.212.110
-      - WEBHOOK_SERVER_HOST=lab1
+      - WEBHOOK_SERVER_HOST=lab1.taild6bdb.ts.net
       - WEBHOOK_SERVER_PORT=13390
     network_mode: service:tailscale-nginx
     volumes:
