@@ -21,11 +21,11 @@
 							<h3 class="f-w-300 d-flex align-items-center m-b-0">
 								<i id="server-status-icon" class="feather icon-arrow-down text-c-red m-r-5"></i>Ragnarok
 								<div id="server-start-icon" class="i-block" data-clipboard-text="Start" data-bs-toggle="tooltip" data-filter="Start" title="" data-bs-original-title="Start" aria-label="Start" style="display: inline-flex;">
-									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-start-ragnarok"><i class="fas fa-play text-c-green m-l-20"></i></a></div>
+									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-start-ragnarok" target="_blank"><i class="fas fa-play text-c-green m-l-20"></i></a></div>
 								<div id="server-stop-icon" class="i-block" data-clipboard-text="Stop" data-bs-toggle="tooltip" data-filter="Stop" title="" data-bs-original-title="Stop" aria-label="Stop" style="display: none;">
-									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-stop-ragnarok"><i class="fas fa-stop text-c-red m-l-20"></i></a></div>
+									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-stop-ragnarok" target="_blank"><i class="fas fa-stop text-c-red m-l-20"></i></a></div>
 								<div id="server-backup-icon" class="i-block" data-clipboard-text="Backup" data-bs-toggle="tooltip" data-filter="Backup" title="" data-bs-original-title="Backup" aria-label="Backup" style="display: inline-flex;">
-									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-backup-ragnarok"><i class="fas fa-copy text-c-blue m-l-20"></i></a></div></h3>
+									<a href="http://{{server_host}}:{{server_port}}/hooks/ark-backup-ragnarok" target="_blank"><i class="fas fa-copy text-c-blue m-l-20"></i></a></div></h3>
 						</div>
 
 						<div class="col-3 text-end">
@@ -135,15 +135,15 @@
 			label: 'Restore',
 			action: function (path) {
 				// Format expected: map.2021-04-14_21.09.58.tar.bz2
-				let [server, ...path] = path.split('.')
-				backup_timestamp = path[0].substr(-2) + '.' + path.slice(1,3).join('.')
-				path = path.join('.')
-				if (server == 'ragnarok') {
+				let [server, ...part] = path.split('.')
+				// Format: 21.09.58
+				backup_timestamp = part[0].substr(-2) + '.' + part.slice(1,3).join('.')
+				if (server.split('/')[1] == 'ragnarok') {
 					var reggie = /(\d{4})-(\d{2})-(\d{2})_(\d{2}).(\d{2}).(\d{2})/
 					var [, year, month, day, hours, minutes, seconds] = reggie.exec(path.split('.').slice(1,4).join('.'))
 					var backup_datetime = new Date(year, month-1, day, hours, minutes, seconds).toLocaleString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", hour:"numeric", minute:"numeric"});
 					console.log('Backup created: ' + backup_datetime)
-					var answer = prompt('Are you sure you want to restore:\n' + path + '\n(Backup created: ' + backup_datetime + ')\nTo confirm, enter the time part of the backup filename (format: HH.MM.SS)\n(E.g. for `ragnarok.2021-04-14_21.09.58.tar.bz2`, enter `21.09.58`)');
+					var answer = prompt('WARNING: Stop server before trying to restore from backup!!!\n\nAre you sure you want to restore:\n' + path.split('/')[1] + '\nCreated: ' + backup_datetime + '\n\nTo confirm, enter the time part of the backup filename\nExpected format: HH.MM.SS\n(E.g. for "ragnarok.2021-04-14_21.09.58.tar.bz2", enter "21.09.58")');
 					console.log(answer)
 					if (answer == backup_timestamp) {
 						run(path, server_host, server_port);
@@ -193,7 +193,7 @@
     xhr2.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
 			let backup_list = JSON.parse(this.responseText);
-			console.log(JSON.stringify(backup_list, null, 4));
+			// console.log(JSON.stringify(backup_list, null, 4));
 
             backup_list[0]["contents"].forEach(function(item) {
 				if (item.type == 'directory') {
@@ -212,7 +212,7 @@
 							}
 						});
 					} else {
-						console.log('[Error] Encountered directory with no files: ' + item.name);
+						// console.log('[Error] Encountered directory with no files: ' + item.name);
 					}
 				} else {
 					console.log('[Error] Encountered file where only dated directories of backups should be: ' + item.name);
